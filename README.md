@@ -90,40 +90,6 @@ Validate before publish:
 homey app validate
 ```
 
-## Publish to Homey Store
-
-1. Confirm you are logged in to the correct Athom developer account:
-
-```bash
-homey whoami
-```
-
-2. Validate the app at publish level:
-
-```bash
-homey app validate --level publish
-```
-
-3. Bump version when needed:
-
-```bash
-homey app version patch
-```
-
-4. Update release notes in `.homeychangelog.json` for the new version key.
-
-5. Publish to the Homey Store:
-
-```bash
-homey app publish
-```
-
-6. Open the app listing page:
-
-```bash
-homey app view
-```
-
 ## Pairing devices in Homey
 
 1. In Homey, add a device from the Somfy Protect Integration app.
