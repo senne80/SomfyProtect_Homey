@@ -1,0 +1,6 @@
+/.homeybuild/
+/.venv/
+/.env
+/env.json
+/node_modules/
+.DS_Store

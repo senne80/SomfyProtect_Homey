@@ -1,0 +1,8 @@
+{
+  "1.0.0": {
+    "en": "Initial standalone Somfy Protect release with in-app login and direct Homey sync."
+  },
+  "1.0.1": {
+    "en": "First publish"
+  }
+}

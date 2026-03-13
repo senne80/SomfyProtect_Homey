@@ -1,0 +1,17 @@
+{
+  "name": {
+    "en": "Somfy Quick Alarm"
+  },
+  "height": 140,
+  "settings": [],
+  "api": {
+    "getOverview": {
+      "method": "GET",
+      "path": "/overview"
+    },
+    "setSiteState": {
+      "method": "PUT",
+      "path": "/site/:id/state"
+    }
+  }
+}

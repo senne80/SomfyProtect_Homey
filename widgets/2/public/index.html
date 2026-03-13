@@ -1,0 +1,120 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        --somfy-yellow: #f3b400;
+        --neutral: #ececec;
+        --text: #111111;
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+
+      .wrap {
+        height: 100%;
+        box-sizing: border-box;
+        padding: var(--homey-su-2);
+        display: grid;
+        align-items: center;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 6px;
+      }
+
+      .btn {
+        border: none;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 10px 6px;
+        background: var(--neutral);
+        color: var(--text);
+      }
+
+      .btn.active {
+        background: var(--somfy-yellow);
+      }
+
+      .btn:disabled {
+        opacity: 0.5;
+      }
+    </style>
+  </head>
+  <body class="homey-widget">
+    <div class="wrap">
+      <div class="actions">
+        <button id="btnDisarmed" class="btn">Disarm</button>
+        <button id="btnPartial" class="btn">Partial</button>
+        <button id="btnArmed" class="btn">Arm</button>
+      </div>
+    </div>
+
+    <script>
+      let HomeyRef = null;
+      let currentSite = null;
+
+      function normalizeState(value) {
+        const v = String(value || 'disarmed').toLowerCase();
+        if (v === 'armed') return 'armed';
+        if (v === 'partially_armed' || v === 'partial') return 'partially_armed';
+        return 'disarmed';
+      }
+
+      function setActiveButton(state) {
+        const normalized = normalizeState(state);
+        document.getElementById('btnDisarmed').classList.toggle('active', normalized === 'disarmed');
+        document.getElementById('btnPartial').classList.toggle('active', normalized === 'partially_armed');
+        document.getElementById('btnArmed').classList.toggle('active', normalized === 'armed');
+      }
+
+      async function updateState(state) {
+        if (!currentSite) {
+          return;
+        }
+
+        try {
+          const encoded = encodeURIComponent(String(currentSite.externalId));
+          const overview = await HomeyRef.api('PUT', `/site/${encoded}/state`, { state });
+          const sites = Array.isArray(overview && overview.sites) ? overview.sites : [];
+          currentSite = sites[0] || currentSite;
+          setActiveButton(currentSite.state);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      async function loadOverview() {
+        try {
+          const overview = await HomeyRef.api('GET', '/overview', {});
+          const sites = Array.isArray(overview && overview.sites) ? overview.sites : [];
+          currentSite = sites[0] || null;
+          setActiveButton(currentSite ? currentSite.state : 'disarmed');
+
+          const disabled = !currentSite;
+          document.getElementById('btnDisarmed').disabled = disabled;
+          document.getElementById('btnPartial').disabled = disabled;
+          document.getElementById('btnArmed').disabled = disabled;
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      function onHomeyReady(Homey) {
+        HomeyRef = Homey;
+        document.getElementById('btnDisarmed').addEventListener('click', () => updateState('disarmed'));
+        document.getElementById('btnPartial').addEventListener('click', () => updateState('partially_armed'));
+        document.getElementById('btnArmed').addEventListener('click', () => updateState('armed'));
+        loadOverview();
+        Homey.ready();
+      }
+    </script>
+  </body>
+</html>

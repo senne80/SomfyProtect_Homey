@@ -1,0 +1,21 @@
+{
+  "name": {
+    "en": "Somfy Protect Dashboard"
+  },
+  "height": 260,
+  "settings": [],
+  "api": {
+    "getOverview": {
+      "method": "GET",
+      "path": "/overview"
+    },
+    "syncNow": {
+      "method": "POST",
+      "path": "/sync"
+    },
+    "setSiteState": {
+      "method": "PUT",
+      "path": "/site/:id/state"
+    }
+  }
+}

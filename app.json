@@ -1,0 +1,404 @@
+{
+  "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
+  "id": "com.somfyprotect.integration",
+  "version": "1.0.1",
+  "compatibility": ">=12.4.0",
+  "sdk": 3,
+  "runtime": "nodejs",
+  "platforms": [
+    "local"
+  ],
+  "brandColor": "#C2410C",
+  "name": {
+    "en": "Somfy Protect Integration"
+  },
+  "description": {
+    "en": "Connects Somfy Protect sensors and sirens to Homey with built-in account login and polling."
+  },
+  "author": {
+    "name": "Senne"
+  },
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "category": [
+    "security"
+  ],
+  "settings": [
+    {
+      "id": "somfy_username",
+      "type": "text",
+      "title": {
+        "en": "Somfy Username"
+      },
+      "hint": {
+        "en": "Email used for Somfy Protect login"
+      },
+      "value": ""
+    },
+    {
+      "id": "somfy_password",
+      "type": "password",
+      "title": {
+        "en": "Somfy Password"
+      },
+      "value": ""
+    },
+    {
+      "id": "somfy_poll_interval",
+      "type": "number",
+      "title": {
+        "en": "Polling Interval"
+      },
+      "hint": {
+        "en": "Seconds between Somfy sync cycles"
+      },
+      "units": {
+        "en": "seconds"
+      },
+      "value": 5,
+      "min": 5,
+      "max": 300,
+      "step": 1
+    },
+    {
+      "id": "somfy_enabled",
+      "type": "checkbox",
+      "title": {
+        "en": "Enable Somfy Sync"
+      },
+      "hint": {
+        "en": "Enable/disable polling from Somfy Protect"
+      },
+      "value": false
+    }
+  ],
+  "permissions": [],
+  "api": {
+    "getHealth": {
+      "method": "GET",
+      "path": "/health"
+    },
+    "getStatus": {
+      "method": "GET",
+      "path": "/status"
+    },
+    "getDiscoveredDevices": {
+      "method": "GET",
+      "path": "/devices"
+    },
+    "saveCredentials": {
+      "method": "POST",
+      "path": "/credentials"
+    },
+    "clearCredentials": {
+      "method": "DELETE",
+      "path": "/credentials"
+    },
+    "setEnabled": {
+      "method": "POST",
+      "path": "/sync/enabled"
+    },
+    "syncNow": {
+      "method": "POST",
+      "path": "/sync/once"
+    },
+    "setSiteState": {
+      "method": "POST",
+      "path": "/site/:id/state"
+    }
+  },
+  "drivers": [
+    {
+      "name": {
+        "en": "Somfy IntelliTag"
+      },
+      "images": {
+        "small": "/drivers/intellitag/assets/images/small.png",
+        "large": "/drivers/intellitag/assets/images/large.png"
+      },
+      "class": "sensor",
+      "platforms": [
+        "local"
+      ],
+      "connectivity": [
+        "cloud"
+      ],
+      "energy": {
+        "batteries": [
+          "OTHER"
+        ]
+      },
+      "capabilities": [
+        "alarm_contact",
+        "alarm_tamper",
+        "measure_battery"
+      ],
+      "pair": [
+        {
+          "id": "login_credentials",
+          "template": "login_credentials",
+          "options": {
+            "title": {
+              "en": "Sign in to Somfy Protect"
+            },
+            "usernameLabel": {
+              "en": "Somfy Username"
+            },
+            "usernamePlaceholder": {
+              "en": "name@example.com"
+            },
+            "passwordLabel": {
+              "en": "Somfy Password"
+            },
+            "passwordPlaceholder": {
+              "en": "Your password"
+            }
+          }
+        },
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices",
+            "prev": "login_credentials"
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices",
+          "navigation": {
+            "prev": "list_devices"
+          }
+        }
+      ],
+      "id": "intellitag"
+    },
+    {
+      "name": {
+        "en": "Somfy Motion Sensor"
+      },
+      "images": {
+        "small": "/drivers/motion/assets/images/small.png",
+        "large": "/drivers/motion/assets/images/large.png"
+      },
+      "class": "sensor",
+      "platforms": [
+        "local"
+      ],
+      "connectivity": [
+        "cloud"
+      ],
+      "energy": {
+        "batteries": [
+          "OTHER"
+        ]
+      },
+      "capabilities": [
+        "alarm_motion",
+        "measure_battery"
+      ],
+      "pair": [
+        {
+          "id": "login_credentials",
+          "template": "login_credentials",
+          "options": {
+            "title": {
+              "en": "Sign in to Somfy Protect"
+            },
+            "usernameLabel": {
+              "en": "Somfy Username"
+            },
+            "usernamePlaceholder": {
+              "en": "name@example.com"
+            },
+            "passwordLabel": {
+              "en": "Somfy Password"
+            },
+            "passwordPlaceholder": {
+              "en": "Your password"
+            }
+          }
+        },
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices",
+            "prev": "login_credentials"
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices",
+          "navigation": {
+            "prev": "list_devices"
+          }
+        }
+      ],
+      "id": "motion"
+    },
+    {
+      "name": {
+        "en": "Somfy Siren"
+      },
+      "images": {
+        "small": "/drivers/siren/assets/images/small.png",
+        "large": "/drivers/siren/assets/images/large.png"
+      },
+      "class": "siren",
+      "platforms": [
+        "local"
+      ],
+      "connectivity": [
+        "cloud"
+      ],
+      "capabilities": [
+        "alarm_generic",
+        "onoff"
+      ],
+      "pair": [
+        {
+          "id": "login_credentials",
+          "template": "login_credentials",
+          "options": {
+            "title": {
+              "en": "Sign in to Somfy Protect"
+            },
+            "usernameLabel": {
+              "en": "Somfy Username"
+            },
+            "usernamePlaceholder": {
+              "en": "name@example.com"
+            },
+            "passwordLabel": {
+              "en": "Somfy Password"
+            },
+            "passwordPlaceholder": {
+              "en": "Your password"
+            }
+          }
+        },
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices",
+            "prev": "login_credentials"
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices",
+          "navigation": {
+            "prev": "list_devices"
+          }
+        }
+      ],
+      "id": "siren"
+    },
+    {
+      "name": {
+        "en": "Somfy Site Alarm"
+      },
+      "images": {
+        "small": "/drivers/site_alarm/assets/images/small.png",
+        "large": "/drivers/site_alarm/assets/images/large.png"
+      },
+      "class": "sensor",
+      "platforms": [
+        "local"
+      ],
+      "connectivity": [
+        "cloud"
+      ],
+      "capabilities": [
+        "homealarm_state",
+        "alarm_generic"
+      ],
+      "pair": [
+        {
+          "id": "login_credentials",
+          "template": "login_credentials",
+          "options": {
+            "title": {
+              "en": "Sign in to Somfy Protect"
+            },
+            "usernameLabel": {
+              "en": "Somfy Username"
+            },
+            "usernamePlaceholder": {
+              "en": "name@example.com"
+            },
+            "passwordLabel": {
+              "en": "Somfy Password"
+            },
+            "passwordPlaceholder": {
+              "en": "Your password"
+            }
+          }
+        },
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices",
+            "prev": "login_credentials"
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices",
+          "navigation": {
+            "prev": "list_devices"
+          }
+        }
+      ],
+      "id": "site_alarm"
+    }
+  ],
+  "widgets": {
+    "1": {
+      "name": {
+        "en": "Somfy Protect Dashboard"
+      },
+      "height": 260,
+      "settings": [],
+      "api": {
+        "getOverview": {
+          "method": "GET",
+          "path": "/overview"
+        },
+        "syncNow": {
+          "method": "POST",
+          "path": "/sync"
+        },
+        "setSiteState": {
+          "method": "PUT",
+          "path": "/site/:id/state"
+        }
+      },
+      "id": "1"
+    },
+    "2": {
+      "name": {
+        "en": "Somfy Quick Alarm"
+      },
+      "height": 140,
+      "settings": [],
+      "api": {
+        "getOverview": {
+          "method": "GET",
+          "path": "/overview"
+        },
+        "setSiteState": {
+          "method": "PUT",
+          "path": "/site/:id/state"
+        }
+      },
+      "id": "2"
+    }
+  }
+}
