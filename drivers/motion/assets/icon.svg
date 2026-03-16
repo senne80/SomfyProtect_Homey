@@ -1,3 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Somfy Protect shield icon">
-  <path d="M128 24c27 26 53 33 81 33v33c0 54-29 89-81 112-52-23-81-58-81-112V57c28 0 54-7 81-33Z" fill="#F3B400"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Motion sensor icon">
+  <path d="M128 44c34 0 62 28 62 62v94H66v-94c0-34 28-62 62-62Z" fill="#FFFFFF"/>
+  <circle cx="128" cy="120" r="28" fill="#C2410C"/>
+  <path d="M200 88c14 10 24 24 28 42" fill="none" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round"/>
+  <path d="M56 88c-14 10-24 24-28 42" fill="none" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round"/>
 </svg>

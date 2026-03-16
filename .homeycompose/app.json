@@ -12,7 +12,7 @@
     "en": "Somfy Protect Integration"
   },
   "description": {
-    "en": "Connects Somfy Protect sensors and sirens to Homey with built-in account login and polling."
+    "en": "Smart protection at home with Somfy alarm control and live security status in Homey."
   },
   "author": {
     "name": "Senne"
