@@ -1,0 +1,63 @@
+{
+  "name": {
+    "en": "Somfy Smoke Detector"
+  },
+  "images": {
+    "small": "/drivers/smoke/assets/images/small.png",
+    "large": "/drivers/smoke/assets/images/large.png"
+  },
+  "class": "sensor",
+  "platforms": [
+    "local"
+  ],
+  "connectivity": [
+    "cloud"
+  ],
+  "energy": {
+    "batteries": [
+      "OTHER"
+    ]
+  },
+  "capabilities": [
+    "alarm_smoke",
+    "measure_battery"
+  ],
+  "pair": [
+    {
+      "id": "login_credentials",
+      "template": "login_credentials",
+      "options": {
+        "title": {
+          "en": "Sign in to Somfy Protect"
+        },
+        "usernameLabel": {
+          "en": "Somfy Username"
+        },
+        "usernamePlaceholder": {
+          "en": "name@example.com"
+        },
+        "passwordLabel": {
+          "en": "Somfy Password"
+        },
+        "passwordPlaceholder": {
+          "en": "Your password"
+        }
+      }
+    },
+    {
+      "id": "list_devices",
+      "template": "list_devices",
+      "navigation": {
+        "next": "add_devices",
+        "prev": "login_credentials"
+      }
+    },
+    {
+      "id": "add_devices",
+      "template": "add_devices",
+      "navigation": {
+        "prev": "list_devices"
+      }
+    }
+  ]
+}

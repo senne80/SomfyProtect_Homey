@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Smoke detector icon">
+  <g fill="none" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="128" cy="128" r="76"/>
+    <circle cx="128" cy="128" r="24"/>
+    <path d="M88 88h80"/>
+    <path d="M88 168h80"/>
+    <path d="M88 128h18"/>
+    <path d="M150 128h18"/>
+  </g>
+</svg>

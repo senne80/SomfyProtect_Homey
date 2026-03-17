@@ -1,6 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Siren icon">
-  <rect x="60" y="168" width="136" height="26" rx="12" fill="#FFFFFF"/>
-  <path d="M86 168c0-38 24-72 42-82 18 10 42 44 42 82H86Z" fill="#FFFFFF"/>
-  <circle cx="128" cy="128" r="18" fill="#C2410C"/>
-  <path d="M40 110h24M192 110h24M62 70l18 14M194 70l-18 14" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <g fill="none" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="64" y="172" width="128" height="24" rx="10"/>
+    <path d="M90 172c2-36 18-68 38-78 20 10 36 42 38 78"/>
+    <circle cx="128" cy="126" r="16"/>
+    <path d="M42 108h22"/>
+    <path d="M192 108h22"/>
+    <path d="M66 72l16 12"/>
+    <path d="M190 72l-16 12"/>
+  </g>
 </svg>

@@ -30,6 +30,10 @@ const DEVICE_TYPE_MAP = {
     driverId: "site_alarm",
     capabilities: ["homealarm_state", "alarm_generic"],
   },
+  smoke: {
+    driverId: "smoke",
+    capabilities: ["alarm_smoke", "measure_battery"],
+  },
   intellitag: {
     driverId: "intellitag",
     capabilities: ["alarm_contact", "alarm_tamper", "measure_battery"],
@@ -678,6 +682,10 @@ class SomfyProtectApp extends Homey.App {
       return "intellitag";
     }
 
+    if (labels.includes("smoke") || labels.includes("fire") || labels.includes("smokedetector")) {
+      return "smoke";
+    }
+
     if (
       labels.includes("pir") ||
       labels.includes("infrared") ||
@@ -779,6 +787,23 @@ class SomfyProtectApp extends Homey.App {
       const motion = this.coerceBool(this.pick(lookup, ["motion", "motion_detected", "presence", "pir_detected", "human_detected"]));
       if (motion !== null) {
         state.alarm_motion = motion;
+      }
+    }
+
+    if (type === "smoke") {
+      const smoke = this.coerceBool(this.pick(lookup, [
+        "smoke",
+        "smoke_detected",
+        "smoke_alarm",
+        "fire",
+        "fire_detected",
+        "fire_alarm",
+        "alarm",
+        "alarm_triggered",
+        "triggered",
+      ]));
+      if (smoke !== null) {
+        state.alarm_smoke = smoke;
       }
     }
 
@@ -990,7 +1015,7 @@ class SomfyProtectApp extends Homey.App {
 
     if (typeof value === "string") {
       const normalized = value.trim().toLowerCase();
-      if (["1", "true", "on", "open", "opened", "active", "detected", "alarm"].includes(normalized)) {
+      if (["1", "true", "on", "open", "opened", "active", "detected", "alarm", "triggered", "fire", "smoke"].includes(normalized)) {
         return true;
       }
       if (["0", "false", "off", "closed", "idle", "clear", "normal", "standby"].includes(normalized)) {
