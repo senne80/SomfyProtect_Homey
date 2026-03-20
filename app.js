@@ -46,12 +46,17 @@ const DEVICE_TYPE_MAP = {
     driverId: "siren",
     capabilities: ["alarm_generic", "onoff"],
   },
+  camera: {
+    driverId: "camera",
+    capabilities: ["alarm_motion", "alarm_generic", "measure_battery"],
+  },
 };
 
 class SomfyProtectApp extends Homey.App {
   async onInit() {
     this.devicesByExternalId = new Map();
     this.latestStateByExternalId = new Map();
+    this.lastCameraDetectionNotificationAt = new Map();
     this.pollIntervalId = null;
     this.syncInProgress = false;
     this._savingCredentials = false;
@@ -682,6 +687,15 @@ class SomfyProtectApp extends Homey.App {
       return "intellitag";
     }
 
+    if (
+      labels.includes("camera") ||
+      labels.includes("video") ||
+      labels.includes("somfy one") ||
+      labels.includes("myfox security camera")
+    ) {
+      return "camera";
+    }
+
     if (labels.includes("smoke") || labels.includes("fire") || labels.includes("smokedetector")) {
       return "smoke";
     }
@@ -815,6 +829,59 @@ class SomfyProtectApp extends Homey.App {
       }
     }
 
+    if (type === "camera") {
+      const motion = this.coerceBool(this.pick(lookup, [
+        "motion",
+        "motion_detected",
+        "presence",
+        "pir_detected",
+        "human_detected",
+        "person_detected",
+      ]));
+
+      const online = this.coerceBool(this.pick(lookup, [
+        "online",
+        "is_online",
+        "connected",
+        "is_connected",
+      ]));
+
+      const offline = this.coerceBool(this.pick(lookup, ["offline", "is_offline", "disconnected"]));
+
+      if (motion !== null) {
+        state.alarm_motion = motion;
+      }
+
+      if (online !== null || offline !== null) {
+        state.alarm_generic = offline === true || online === false;
+      }
+
+      const snapshotUrl = this.firstString(this.pick(lookup, [
+        "snapshot_url",
+        "snapshot",
+        "latest_snapshot_url",
+        "thumbnail_url",
+        "preview_url",
+      ]));
+
+      const liveUrl = this.firstString(this.pick(lookup, [
+        "live_url",
+        "stream_url",
+        "mjpeg_url",
+        "hls_url",
+        "video_url",
+        "rtsp_url",
+      ]));
+
+      if (snapshotUrl) {
+        state.snapshot_url = snapshotUrl;
+      }
+
+      if (liveUrl) {
+        state.live_url = liveUrl;
+      }
+    }
+
     return state;
   }
 
@@ -894,13 +961,16 @@ class SomfyProtectApp extends Homey.App {
   }
 
   async updateDeviceState(externalId, statePatch) {
+    const previousState = this.latestStateByExternalId.get(externalId) || null;
     const nextState = {
-      ...(this.latestStateByExternalId.get(externalId) || {}),
+      ...(previousState || {}),
       ...statePatch,
       updatedAt: new Date().toISOString(),
     };
 
     this.latestStateByExternalId.set(externalId, nextState);
+
+    await this.maybeNotifyCameraDetection(externalId, previousState, nextState);
 
     const device = this.devicesByExternalId.get(externalId);
     if (!device) {
@@ -916,6 +986,41 @@ class SomfyProtectApp extends Homey.App {
       accepted: true,
       delivered: true,
     };
+  }
+
+  async maybeNotifyCameraDetection(externalId, previousState, nextState) {
+    const registry = this.getDiscoveryRegistry();
+    const discovery = registry[externalId];
+    if (!discovery || discovery.deviceType !== "camera") {
+      return;
+    }
+
+    const previousMotion = this.coerceBool(previousState && previousState.alarm_motion);
+    const currentMotion = this.coerceBool(nextState && nextState.alarm_motion);
+
+    if (currentMotion !== true || previousMotion === true) {
+      return;
+    }
+
+    const now = Date.now();
+    const lastSentAt = Number(this.lastCameraDetectionNotificationAt.get(externalId) || 0);
+    const cooldownMs = 60_000;
+    if (now - lastSentAt < cooldownMs) {
+      return;
+    }
+
+    this.lastCameraDetectionNotificationAt.set(externalId, now);
+
+    const name = discovery.name || "Somfy Camera";
+    const siteLabel = discovery.siteLabel || "Somfy Protect";
+
+    try {
+      await this.homey.notifications.createNotification({
+        excerpt: `${name}: motion detected at ${siteLabel}`,
+      });
+    } catch (error) {
+      this.error(`Failed to send camera motion notification for ${externalId}`, error);
+    }
   }
 
   getHealth() {
@@ -953,6 +1058,42 @@ class SomfyProtectApp extends Homey.App {
         lastSync: status.lastSync || null,
       },
       sites,
+      now: new Date().toISOString(),
+    };
+  }
+
+  getCameraWidgetOverview() {
+    const status = this.getStatus();
+    const registry = this.getDiscoveryRegistry();
+
+    const cameras = Object.values(registry)
+      .filter(entry => entry && entry.deviceType === "camera")
+      .map(entry => {
+        const state = this.latestStateByExternalId.get(entry.externalId) || {};
+
+        return {
+          externalId: entry.externalId,
+          name: entry.name || "Somfy Camera",
+          siteLabel: entry.siteLabel || "",
+          motionDetected: Boolean(this.coerceBool(state.alarm_motion)),
+          connectionAlarm: Boolean(this.coerceBool(state.alarm_generic)),
+          snapshotUrl: this.firstString(state.snapshot_url) || null,
+          liveUrl: this.firstString(state.live_url) || null,
+          updatedAt: state.updatedAt || entry.updatedAt || null,
+        };
+      })
+      .sort((a, b) => String(a.name).localeCompare(String(b.name)));
+
+    return {
+      ok: true,
+      status: {
+        enabled: Boolean(status.enabled),
+        running: Boolean(status.running),
+        hasCredentials: Boolean(status.hasCredentials),
+        discoveredDevices: Number(status.discoveredDevices || 0),
+        lastSync: status.lastSync || null,
+      },
+      cameras,
       now: new Date().toISOString(),
     };
   }
@@ -998,6 +1139,22 @@ class SomfyProtectApp extends Homey.App {
       const found = Object.keys(lookup).find(lookupKey => lookupKey.endsWith(suffix));
       if (found) {
         return lookup[found];
+      }
+    }
+
+    return null;
+  }
+
+  firstString(value) {
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
+
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        if (typeof item === "string" && item.trim()) {
+          return item.trim();
+        }
       }
     }
 

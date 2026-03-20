@@ -1,0 +1,17 @@
+{
+  "name": {
+    "en": "Somfy Camera View"
+  },
+  "height": 260,
+  "settings": [],
+  "api": {
+    "getCameras": {
+      "method": "GET",
+      "path": "/cameras"
+    },
+    "syncNow": {
+      "method": "POST",
+      "path": "/sync"
+    }
+  }
+}
